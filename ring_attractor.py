@@ -10,20 +10,17 @@ import nest
 # sig1 controls how wide the peak is
 # sig2 controls how fast the negative lobes asymptote to 0 
 
-# def sombrero(x, mu, sig1 = 8, sig2 = 15):
-#     return 10 * (1 - ((x - mu) ** 2) / (sig1 ** 2)) * np.exp(-((x - mu) ** 2) / (2 * sig2 ** 2))
-
-def sombrero(i, j, num_neurons, sigma1 = 5, sigma2 = 10):
+def sombrero(i, j, num_neurons, sigma1 = 4, sigma2 = 15):
     # Calculate the shortest distance between neurons i and j, taking into account periodic boundary conditions
     distance = min(abs(i - j), num_neurons - abs(i - j))
-    return (1 - (distance ** 2) / sigma1 ** 2) * np.exp(-(distance ** 2) / (2 * sigma2 ** 2))
+    return 5 * (1 - (distance ** 2) / sigma1 ** 2) * np.exp(-(distance ** 2) / (2 * sigma2 ** 2))
 
 
 if __name__ == "__main__": 
     nest.ResetKernel()
     
     num_neurons = 100
-    parameter_dict = {"I_e": 0.0, "tau_m": 20.0, "V_m": -77.0, "V_th": -55.0}
+    parameter_dict = {"I_e": 175.0, "tau_m": 20.0, "V_m": -77.0, "V_th": -55.0}
     # parameter_dict = {"tau_m": 20.0, "V_m": -77.0}
     neurons = nest.Create("iaf_psc_alpha", num_neurons, params=parameter_dict)
 
@@ -33,11 +30,15 @@ if __name__ == "__main__":
             if i != j:  # no self-connections
                 nest.Connect(neurons[i], neurons[j], syn_spec={"weight": sombrero(j, i, num_neurons)})
 
-    # Create DC generator
-    generator = nest.Create("dc_generator")
+    # # Create DC generator
+    # generator = nest.Create("dc_generator")
+    # # Set the amplitude of the DC generator
+    # nest.SetStatus(generator, {"amplitude": 188.0})
 
-    # Set the amplitude of the DC generator
-    nest.SetStatus(generator, {"amplitude": 200.0})
+    # Create a Poisson generator 
+    generator = nest.Create("poisson_generator")
+    # Set the rate of the Poisson generator
+    nest.SetStatus(generator, {"rate": 7000.0})
 
     # Connect generator to first 10 neurons 
     nest.Connect(generator, neurons)
@@ -58,11 +59,10 @@ if __name__ == "__main__":
 
     # weights = nest.GetStatus(connections, "weight")
     # # Create a histogram of the weights
-    # # # plt.hist(weights, bins=20)
-    # # # plt.xlabel('Weight')
-    # # # plt.ylabel('Number of connections')
-    # # plt.figure(2)
-    # plt.plot(weights)
+    # plt.hist(weights, bins=20)
+    # plt.xlabel('Weight')
+    # plt.ylabel('Number of connections')
+    # # plt.plot(weights)
     # plt.show()
 
     # # ***********************

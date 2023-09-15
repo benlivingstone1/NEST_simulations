@@ -1,0 +1,14 @@
+##########################################
+NOTES ON RING ATTRACTOR BEHAVIOR:
+
+    - Poisson Generator:
+        > Rate = 6000: sparse activity
+        > Rate = 7000: attractor bump
+        > Rate = 8000: unstable bumps 
+        > Settings to reproduce: 
+            num_neurons = 100
+            parameter_dict = {"I_e": 150.0, "tau_m": 20.0, "V_m": -77.0, "V_th": -55.0}
+            nest.SetStatus(generator, {"rate": 7000.0})
+            
+
+#########################################
